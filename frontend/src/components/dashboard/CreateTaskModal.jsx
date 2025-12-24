@@ -3,19 +3,19 @@ import { useState } from "react";
 const CreateTaskModal = ({ onClose, addTask }) => {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("MEDIUM");
+const [dueDate, setDueDate] = useState("");
+const handleCreate = async () => {
+  if (!title || !dueDate) return;
 
-  const handleCreate = () => {
-    if (!title) return;
+  await addTask({
+    title,
+    priority,
+    dueDate, // 👈 SEND TO BACKEND
+  });
 
-    addTask({
-      id: Date.now(),
-      title,
-      priority,
-      status: "PENDING",
-    });
+  onClose();
+};
 
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
@@ -33,6 +33,15 @@ const CreateTaskModal = ({ onClose, addTask }) => {
             bg-slate-100 dark:bg-slate-700
             text-slate-900 dark:text-white"
           />
+          <input
+  type="datetime-local"
+  value={dueDate}
+  onChange={(e) => setDueDate(e.target.value)}
+  className="w-full px-4 py-2 rounded-lg
+  bg-slate-100 dark:bg-slate-700
+  text-slate-900 dark:text-white"
+/>
+
 
           <select
             value={priority}

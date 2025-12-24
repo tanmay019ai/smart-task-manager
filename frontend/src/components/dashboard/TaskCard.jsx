@@ -1,53 +1,78 @@
-const priorityColor = {
-  HIGH: "bg-red-500",
-  MEDIUM: "bg-yellow-400",
-  LOW: "bg-green-500",
-};
+import { formatDate, timeRemaining } from "../../util/date.js";
 
-const statusStyle = {
-  PENDING: "text-blue-500",
-  COMPLETED: "text-green-500",
-  OVERDUE: "text-red-500",
-};
-
-const TaskCard = ({ task, updateTaskStatus }) => {
+const TaskCard = ({ task, markCompleted, deleteTask }) => {
   return (
     <div
-      className={`p-5 rounded-xl shadow flex justify-between items-center
-      bg-white dark:bg-slate-800
-      ${task.status === "OVERDUE" ? "border-2 border-red-500" : ""}`}
+      className={`p-5 rounded-xl shadow bg-white dark:bg-slate-800
+      flex justify-between items-start
+      ${
+        task.status === "OVERDUE"
+          ? "border-2 border-red-500 bg-red-50 dark:bg-red-900/20"
+          : ""
+      }`}
     >
-      <div>
+      {/* LEFT */}
+      <div className="space-y-1">
         <h3
-          className={`font-semibold
-          ${task.status === "COMPLETED"
-            ? "line-through text-slate-400"
-            : "text-slate-900 dark:text-white"}`}
+          className={`font-semibold text-lg
+          ${
+            task.status === "COMPLETED"
+              ? "line-through text-slate-400"
+              : "text-slate-900 dark:text-white"
+          }`}
         >
           {task.title}
         </h3>
 
-        <p className={`text-sm ${statusStyle[task.status]}`}>
-          {task.status}
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Due:{" "}
+          <span className="font-medium">
+            {formatDate(task.dueDate)}
+          </span>
+        </p>
+
+        <p
+          className={`text-sm font-semibold
+          ${
+            task.status === "OVERDUE"
+              ? "text-red-600"
+              : task.status === "COMPLETED"
+              ? "text-green-500"
+              : "text-blue-500"
+          }`}
+        >
+          {task.status} • {timeRemaining(task.dueDate)}
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span
-          className={`px-3 py-1 rounded-full text-black text-sm font-medium
-          ${priorityColor[task.priority]}`}
-        >
+      {/* RIGHT */}
+      <div className="flex flex-col items-end gap-2">
+        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-slate-700">
           {task.priority}
         </span>
 
-        {task.status === "PENDING" && (
+        {/* ACTION BUTTONS */}
+        <div className="flex gap-2">
+          {task.status === "PENDING" && (
+            <button
+              onClick={() => markCompleted(task._id)}
+              className="px-3 py-1 rounded-lg bg-green-500 text-black text-sm"
+            >
+              ✓ Done
+            </button>
+          )}
+
           <button
-            onClick={() => updateTaskStatus(task.id, "COMPLETED")}
-            className="px-3 py-1 rounded-lg bg-green-500 text-black text-sm"
+            onClick={() => {
+              if (window.confirm("Delete this task permanently?")) {
+                deleteTask(task._id);
+              }
+            }}
+            className="px-3 py-1 rounded-lg bg-red-500 text-white text-sm"
           >
-            ✓ Done
+            Delete
           </button>
-        )}
+        </div>
       </div>
     </div>
   );
